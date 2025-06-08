@@ -36,6 +36,11 @@ app.use("/managers", authMiddleware(["manager"]), managerRoutes);
 
 /* SERVER */
 const port = Number(process.env.PORT) || 3002;
-app.listen(port, "0.0.0.0", () => {
-  console.log(`Server running on port ${port}`);
-});
+console.log("Starting the server setup...");
+try {
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on port ${port}`);
+  });
+} catch (err) {
+  console.error("Failed to start server:", err);
+}
