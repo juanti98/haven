@@ -12,27 +12,35 @@ const PropertyLocation = ({ propertyId }: PropertyDetailsProps) => {
     isError,
     isLoading,
   } = useGetPropertyQuery(propertyId);
+
   const mapContainerRef = useRef(null);
 
   useEffect(() => {
-    if (isLoading || isError || !property) return;
+    const coordinates = property?.location?.coordinates;
+    const lat = coordinates?.latitude;
+    const lng = coordinates?.longitude;
+
+    if (
+      isLoading ||
+      isError ||
+      !property ||
+      !coordinates ||
+      typeof lat !== "number" ||
+      typeof lng !== "number"
+    ) {
+      return;
+    }
+
+    console.log("Initializing Mapbox with coordinates:", { lat, lng });
 
     const map = new mapboxgl.Map({
       container: mapContainerRef.current!,
-      style: "mapbox://styles/majesticglue/cm6u301pq008b01sl7yk1cnvb",
-      center: [
-        property.location.coordinates.longitude,
-        property.location.coordinates.latitude,
-      ],
+      style: "mapbox://styles/juanti/cmbnp53qd00t901sm2g1kctjz",
+      center: [lng, lat],
       zoom: 14,
     });
 
-    const marker = new mapboxgl.Marker()
-      .setLngLat([
-        property.location.coordinates.longitude,
-        property.location.coordinates.latitude,
-      ])
-      .addTo(map);
+    const marker = new mapboxgl.Marker().setLngLat([lng, lat]).addTo(map);
 
     const markerElement = marker.getElement();
     const path = markerElement.querySelector("path[fill='#3FB1CE']");
@@ -42,8 +50,15 @@ const PropertyLocation = ({ propertyId }: PropertyDetailsProps) => {
   }, [property, isError, isLoading]);
 
   if (isLoading) return <>Loading...</>;
-  if (isError || !property) {
-    return <>Property not Found</>;
+
+  const coordinates = property?.location?.coordinates;
+  const coordsMissing =
+    !coordinates ||
+    typeof coordinates.latitude !== "number" ||
+    typeof coordinates.longitude !== "number";
+
+  if (isError || !property || coordsMissing) {
+    return <>Property not found or coordinates missing</>;
   }
 
   return (
