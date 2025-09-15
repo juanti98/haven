@@ -51,7 +51,7 @@ const Navbar = () => {
           >
             <div className="flex items-center gap-3">
               <Image
-                src="/logo.png"
+                src="/Logo.png"
                 alt="Haven Logo"
                 width={24}
                 height={24}
